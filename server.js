@@ -1,5 +1,10 @@
-const express = require('express')
-const app = express()
+const express = require('express');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db');
+const app = require('./app');
+dotenv.config();
+connectDB();
+
 const port = 3000
 
 app.get('/', (req, res) => {
