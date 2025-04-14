@@ -1,16 +1,18 @@
 require('dotenv').config();
-
-// app.js
 const express = require('express');
 const app = express();
 
-// Middleware for parsing
 app.use(express.json());
 
-// Import routes
 const testRoutes = require('./routes/testRoutes');
+const authRoutes = require('./routes/authRoutes');
 
-// Use routes
 app.use('/api/v1/test', testRoutes);
+app.use('/api/v1/auth', authRoutes);
+
+
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+});
 
 module.exports = app;
