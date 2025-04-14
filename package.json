@@ -8,13 +8,22 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "This is a full-stack web application for an **Online Event Ticketing System** that allows users to browse, search, and book tickets for various events such as concerts, sports games, and theater shows.",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.11.0"
-  }
+    "mongoose": "^8.13.2",
+    "nodemon": "^3.1.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snipseas/EventTicketingSystem.git"
+  },
+  "bugs": {
+    "url": "https://github.com/snipseas/EventTicketingSystem/issues"
+  },
+  "homepage": "https://github.com/snipseas/EventTicketingSystem#readme"
 }
