@@ -1,13 +1,22 @@
 // config/db.js
-const mongoose = require('mongoose');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+require('dotenv').config();
 
 const connectDB = async() => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+        const client = await MongoClient.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+
+        console.log('✅ MongoDB Connected successfully');
+
+        // You can export the DB object if needed
+        const db = client.db(); // You can also specify db name: client.db('yourDBName')
+        return db;
     } catch (error) {
-        console.error(`❌ MongoDB connection failed: ${error.message}`);
-        process.exit(1); // Stop the server if DB connection fails
+        console.error('❌MongoDB connection failed:' + error.message);
+        process.exit(1);
     }
 };
 
