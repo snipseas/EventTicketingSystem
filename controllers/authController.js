@@ -2,6 +2,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const generateToken = require('../utils/generateToken');
+const jwt = require('jsonwebtoken');
 
 const registerUser = async(req, res, next) => {
     console.log('Register route hit');
@@ -19,8 +20,9 @@ const registerUser = async(req, res, next) => {
 
         const newUser = await User.create({ name, email, password, role });
 
-        const token = generateToken(newUser._id, newUser.role);
+        const token = generateToken(user)
 
+        console.log(token)
         res.status(201).json({
             _id: newUser._id,
             name: newUser.name,
@@ -55,7 +57,9 @@ const loginUser = async(req, res, next) => {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
-        const token = generateToken(user._id, user.role);
+        const token = generateToken(user)
+
+        console.log("Updated Token: " + token)
 
         res.status(200).json({
             _id: user._id,
