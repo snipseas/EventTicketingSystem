@@ -5,5 +5,4 @@ module.exports = {
     event: require("../routes/eventRoutes.js"),
     test: require("../routes/testRoutes.js"),
     user: require("../routes/userRoutes.js"),
-    booking: require("../routes/bookingRoutes.js")
 }

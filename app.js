@@ -11,7 +11,6 @@ app.get('/', (req, res) => {
 app.use('/api/v1/auth', routes.auth);
 app.use('/api/v1/test', routes.test);
 app.use('/api/v1/users', routes.user);
-app.use('/api/v1/bookings', routes.booking);
 
 
 // app.get((req, res) => {
