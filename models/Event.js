@@ -19,8 +19,10 @@ const eventSchema = new mongoose.Schema({
         default: 'pending'
     }
 }, { timestamps: true });
-eventSchema.virtual('ticketsSoldPercent').get(function() {
-    return (this.ticketsSold / this.ticketsAvailable) * 100;
-  });
 
-module.exports = mongoose.model('Event', eventSchema);
+eventSchema.virtual('ticketsSoldPercent').get(function() {
+    const sold = this.totalTickets - this.availableTickets;
+    return (sold / this.totalTickets) * 100;
+});
+
+module.exports = mongoose.models.Event || mongoose.model('Event', eventSchema);
