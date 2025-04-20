@@ -1,31 +1,11 @@
-const express = require('express');
-const {
-  NotFoundError,
-  UnauthorizedError
-} = require('../middleware/errorHandler');
-const Booking = require('../models/Booking');
-
+const express = require("express");
+const bookingController = require("../controllers/bookingController");
+const authMiddleware = require("../middleware/authMiddleware");
+const authorize = require("../middleware/authorize");
 const router = express.Router();
 
-// Get booking by ID
-router.get('/:id', async (req, res, next) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
-    
-    if (!booking) {
-      throw new NotFoundError('Booking');
-    }
-    
-    // Check if user owns this booking
-    if (booking.user.toString() !== req.user.id) {
-      throw new UnauthorizedError();
-    }
-    
-    res.json(booking);
-  } catch (err) {
-    next(err);
-  }
-});
+router.get('/my-bookings', authMiddleware, authorize(['User']), bookingController.getMyBookings);
+router.post('/book', authMiddleware, authorize(['User']), bookingController.bookTickets);
+router.put('/cancel/:id', authMiddleware, authorize(['User']), bookingController.cancelBooking);
 
-// Other booking routes...
 module.exports = router;
