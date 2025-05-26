@@ -1,9 +1,14 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
+import Loader from '../components/shared/Loader';
 
 const ProtectedRoute = ({ allowedRoles }) => {
-    const { user } = useAuthContext();
+    const { user, loading } = useAuthContext();
+
+    if (loading) {
+        return <Loader />;
+    }
 
     // If the user is not logged in, redirect to the login page
     if (!user) {

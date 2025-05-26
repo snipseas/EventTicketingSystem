@@ -1,96 +1,169 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import {
+    Container,
+    Paper,
+    Typography,
+    TextField,
+    Button,
+    Grid,
+    Box,
+    Avatar
+} from '@mui/material';
+import { Person } from '@mui/icons-material';
+import { useAuthContext } from '../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
-    const [profile, setProfile] = useState(null);
-    const [editMode, setEditMode] = useState(false);
-    const [form, setForm] = useState({ name: '', email: '' });
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const { user, updateProfile } = useAuthContext();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        name: user?.name || '',
+        email: user?.email || '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    });
 
-    useEffect(() => {
-        setLoading(true);
-        axios.get('/api/v1/users/me')
-            .then(res => {
-                setProfile(res.data);
-                setForm({ name: res.data.name, email: res.data.email });
-                setLoading(false);
-            })
-            .catch(() => {
-                setError('Failed to load profile.');
-                setLoading(false);
-            });
-    }, []);
-
-    const handleChange = e => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
     };
 
-    const handleSave = e => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSaving(true);
-        setError('');
-        setSuccess('');
-        axios.put('/api/v1/users/me', form)
-            .then(res => {
-                setProfile(res.data);
-                setEditMode(false);
-                setSuccess('Profile updated successfully.');
-                setSaving(false);
-            })
-            .catch(() => {
-                setError('Failed to update profile.');
-                setSaving(false);
-            });
-    };
+        setLoading(true);
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div style={{ color: 'red' }}>{error}</div>;
-    if (!profile) return <div>No profile data.</div>;
+        try {
+            if (formData.newPassword) {
+                if (formData.newPassword !== formData.confirmPassword) {
+                    toast.error('New passwords do not match');
+                    return;
+                }
+                if (!formData.currentPassword) {
+                    toast.error('Current password is required to change password');
+                    return;
+                }
+            }
+
+            const updateData = {
+                name: formData.name,
+                email: formData.email
+            };
+
+            if (formData.newPassword) {
+                updateData.currentPassword = formData.currentPassword;
+                updateData.newPassword = formData.newPassword;
+            }
+
+            await updateProfile(updateData);
+            toast.success('Profile updated successfully');
+            
+            // Clear password fields
+            setFormData(prev => ({
+                ...prev,
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+            }));
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to update profile');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="profile-page">
-            <h2>My Profile</h2>
-            {success && <div style={{ color: 'green' }}>{success}</div>}
-            {!editMode ? (
-                <div>
-                    <p><strong>Name:</strong> {profile.name}</p>
-                    <p><strong>Email:</strong> {profile.email}</p>
-                    <p><strong>Role:</strong> {profile.role}</p>
-                    <button onClick={() => setEditMode(true)}>Edit Profile</button>
-                </div>
-            ) : (
-                <form onSubmit={handleSave}>
-                    <div>
-                        <label>Name: </label>
-                        <input
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Email: </label>
-                        <input
-                            name="email"
-                            type="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <button type="submit" disabled={saving}>
-                        {saving ? 'Saving...' : 'Save'}
-                    </button>
-                    <button type="button" onClick={() => setEditMode(false)} disabled={saving}>
-                        Cancel
-                    </button>
+        <Container maxWidth="md">
+            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+                    <Avatar sx={{ width: 60, height: 60, bgcolor: 'primary.main', mr: 2 }}>
+                        <Person sx={{ fontSize: 40 }} />
+                    </Avatar>
+                    <Typography variant="h4">
+                        Profile Settings
+                    </Typography>
+                </Box>
+                <form onSubmit={handleSubmit}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12}>
+                            <Typography variant="h6" gutterBottom>
+                                Personal Information
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Name"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Email"
+                                name="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                                Change Password
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Current Password"
+                                name="currentPassword"
+                                type="password"
+                                value={formData.currentPassword}
+                                onChange={handleChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="New Password"
+                                name="newPassword"
+                                type="password"
+                                value={formData.newPassword}
+                                onChange={handleChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Confirm New Password"
+                                name="confirmPassword"
+                                type="password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
+                                </Button>
+                            </Box>
+                        </Grid>
+                    </Grid>
                 </form>
-            )}
-        </div>
+            </Paper>
+        </Container>
     );
 };
 
