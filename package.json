@@ -1,6 +1,39 @@
-{
+
   "dependencies": {
     "chart.js": "^4.4.9",
     "react-chartjs-2": "^5.3.0"
   }
-}
+
+    "name": "event",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "This is a full-stack web application for an **Online Event Ticketing System** that allows users to browse, search, and book tickets for various events such as concerts, sports games, and theater shows.",
+    "dependencies": {
+        "bcrypt": "^5.1.1",
+        "bcryptjs": "^3.0.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "event": "file:",
+        "express": "^4.21.2",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^6.15.0",
+        "mongoose": "^8.13.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/snipseas/EventTicketingSystem.git"
+    },
+    "bugs": {
+        "url": "https://github.com/snipseas/EventTicketingSystem/issues"
+    },
+    "homepage": "https://github.com/snipseas/EventTicketingSystem#readme",
+    "devDependencies": {
+        "nodemon": "^3.1.9"
+    }
+
