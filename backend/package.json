@@ -10,6 +10,7 @@
     "license": "ISC",
     "description": "This is a full-stack web application for an **Online Event Ticketing System** that allows users to browse, search, and book tickets for various events such as concerts, sports games, and theater shows.",
     "dependencies": {
+        "axios": "^1.9.0",
         "bcrypt": "^5.1.1",
         "bcryptjs": "^3.0.2",
         "cors": "^2.8.5",

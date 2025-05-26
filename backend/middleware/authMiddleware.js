@@ -61,4 +61,8 @@ const authorize = (...roles) => {
         next();
     };
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 188db3836179c409f80d402ae1cb19d60bf29d87
 module.exports = { protect, authorize };
