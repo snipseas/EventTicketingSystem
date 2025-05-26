@@ -1,14 +1,9 @@
-{
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 188db3836179c409f80d402ae1cb19d60bf29d87
+
   "dependencies": {
     "chart.js": "^4.4.9",
     "react-chartjs-2": "^5.3.0"
   }
-<<<<<<< HEAD
-=======
+
     "name": "event",
     "version": "1.0.0",
     "main": "index.js",
@@ -41,7 +36,4 @@
     "devDependencies": {
         "nodemon": "^3.1.9"
     }
->>>>>>> 4c5dbdd5daa4cf58f88523cbce826671a54ec5de
-=======
->>>>>>> 188db3836179c409f80d402ae1cb19d60bf29d87
-}
+
