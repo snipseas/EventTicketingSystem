@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { CalendarToday, LocationOn, LocalOffer, ConfirmationNumber } from '@mui/icons-material';
 import { events, bookings } from '../../services/api';
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useAuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import Loader from '../shared/Loader';
 

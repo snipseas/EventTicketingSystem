@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Paper, Typography, Box, Container } from '@mui/material';
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useAuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import Loader from '../shared/Loader';
 

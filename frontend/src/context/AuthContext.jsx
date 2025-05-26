@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import api from '../services/api'; // Axios instance
+import { auth } from '../services/api'; // Use the auth object from api.js
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
@@ -10,17 +10,17 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     // Login function
-    const login = async (email, password) => {
+    const login = async ({ email, password }) => {
         setLoading(true);
         try {
-            const response = await api.post('/login', { email, password });
+            const response = await auth.login({ email, password });
             const { token, user } = response.data;
             localStorage.setItem('token', token);
             setUser(user);
             navigate('/');
-            // eslint-disable-next-line no-useless-catch
+            return { success: true };
         } catch (error) {
-            throw error;
+            return { success: false, error: error.response?.data?.message || 'Login failed' };
         } finally {
             setLoading(false);
         }
@@ -30,10 +30,10 @@ export const AuthProvider = ({ children }) => {
     const register = async (userData) => {
         setLoading(true);
         try {
-            await api.post('/register', userData);
-            // eslint-disable-next-line no-useless-catch
+            await auth.register(userData);
+            return { success: true };
         } catch (error) {
-            throw error;
+            return { success: false, error: error.response?.data?.message || 'Registration failed' };
         } finally {
             setLoading(false);
         }
@@ -41,7 +41,15 @@ export const AuthProvider = ({ children }) => {
 
     // Forgot Password function
     const forgotPassword = async (email) => {
-        await api.put('/forgetPassword', { email });
+        setLoading(true);
+        try {
+            await auth.forgotPassword(email);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.response?.data?.message || 'Failed to send reset instructions' };
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Logout function
@@ -58,5 +66,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuthContext = () => useContext(AuthContext);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from '../context/AuthContext';
 import Loader from '../components/shared/Loader';
 
 const ProtectedRoute = ({ allowedRoles }) => {
