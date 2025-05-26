@@ -1,11 +1,16 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
 const app = express();
 const routes = require("./utils/routesExporter.js")
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Middleware
+app.use(cors());  // Allow all origins in development
+app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Test route
 app.get('/', (req, res) => {
@@ -13,11 +18,10 @@ app.get('/', (req, res) => {
 });
 
 // ACTUAL ROUTES (must come before catch-all)
-app.use('/api/v1/auth', routes.auth);
-app.use('/api/v1/bookings', routes.booking);  // Changed to match exporter
-app.use('/api/v1/events', routes.event);      // Changed to match exporter
-app.use('/api/v1/test', routes.test);
-app.use('/api/v1/users', routes.user);// Add this line for events
+app.use('/api/auth', routes.auth);
+app.use('/api/bookings', routes.booking);
+app.use('/api/events', routes.event);
+app.use('/api/users', routes.user);
 
 // Catch-all for undefined routes (MUST COME AFTER ALL ROUTES)
 app.all('*', (req, res, next) => {

@@ -41,8 +41,8 @@ const App = () => {
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 <AuthProvider>
-                    <Layout>
-                        <Routes>
+                    <Routes>
+                        <Route element={<Layout />}>
                             {/* Public Routes */}
                             <Route path="/" element={<EventListPage />} />
                             <Route path="/events" element={<EventListPage />} />
@@ -73,8 +73,8 @@ const App = () => {
 
                             {/* Fallback Route */}
                             <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </Layout>
+                        </Route>
+                    </Routes>
                 </AuthProvider>
                 <ToastContainer position="top-right" autoClose={3000} />
             </ThemeProvider>

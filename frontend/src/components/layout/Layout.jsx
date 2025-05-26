@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import {
     AppBar,
     Box,
@@ -32,7 +32,7 @@ import { useAuthContext } from '../../contexts/AuthContext';
 
 const drawerWidth = 240;
 
-const Layout = ({ children }) => {
+const Layout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user, logout } = useAuthContext();
@@ -206,10 +206,11 @@ const Layout = ({ children }) => {
                     flexGrow: 1,
                     p: 3,
                     width: { sm: `calc(100% - ${drawerWidth}px)` },
-                    mt: 8
+                    ml: { sm: `${drawerWidth}px` },
+                    mt: '64px'
                 }}
             >
-                {children}
+                <Outlet />
             </Box>
         </Box>
     );
