@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', token);
             setUser(user);
             navigate('/');
+            // eslint-disable-next-line no-useless-catch
         } catch (error) {
             throw error;
         } finally {
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         try {
             await api.post('/register', userData);
+            // eslint-disable-next-line no-useless-catch
         } catch (error) {
             throw error;
         } finally {
@@ -56,4 +58,5 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuthContext = () => useContext(AuthContext);
