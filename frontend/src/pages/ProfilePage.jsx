@@ -10,7 +10,7 @@ import {
     Avatar
 } from '@mui/material';
 import { Person } from '@mui/icons-material';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuthContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
 const ProfilePage = () => {

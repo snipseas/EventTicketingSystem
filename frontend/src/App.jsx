@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import theme from './theme';
 
 // Context Providers
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 // Layout Components
 import Layout from './components/layout/Layout';
