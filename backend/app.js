@@ -7,7 +7,12 @@ const routes = require("./utils/routesExporter.js")
 const { errorHandler } = require('./middleware/errorHandler');
 
 // Middleware
-app.use(cors());  // Allow all origins in development
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:5173'], // Allow both ports
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

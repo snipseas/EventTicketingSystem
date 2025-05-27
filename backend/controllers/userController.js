@@ -1,20 +1,31 @@
 const User = require('../models/User');
 const Booking = require('../models/Booking');
 const Event = require('../models/Event');
+const bcrypt = require('bcrypt');
 
-const getUserProfile = (req, res) => {
-    if (!req.user) {
-        return res.status(402).json({ message: 'Not Authorized' });
+const getUserProfile = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: 'Not Authorized' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        });
+    } catch (error) {
+        console.error('Profile fetch error:', error);
+        res.status(500).json({ message: 'Error fetching profile', error: error.message });
     }
-
-    res.status(200).json({
-        id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-        role: req.user.role,
-        createdAt: req.user.createdAt,
-        updatedAt: req.user.updatedAt
-    })
 };
 
 const updateUserProfile = async(req, res) => {
@@ -139,9 +150,19 @@ const getUserBookings = async(req, res) => {
 // Fetch current user's events (Event Organizer)
 const getUserEvents = async(req, res) => {
     try {
+        if (!req.user) {
+            return res.status(401).json({ message: 'Not Authorized' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         const events = await Event.find({ organizer: req.user._id });
         res.status(200).json(events);
     } catch (error) {
+        console.error('Events fetch error:', error);
         res.status(500).json({ message: 'Error fetching events', error: error.message });
     }
 };

@@ -1,10 +1,10 @@
-import axios from 'axios';
+import api from './api';
 
 export const createBooking = (bookingData) =>
-    axios.post('/api/v1/bookings', bookingData);
+    api.post('/bookings', bookingData);
 
 export const getBookingById = (id) =>
-    axios.get(`/api/v1/bookings/${id}`);
+    api.get(`/bookings/${id}`);
 
 export const cancelBooking = (id) =>
-    axios.delete(`/api/v1/bookings/${id}`);
+    api.delete(`/bookings/${id}`);

@@ -1,22 +1,22 @@
-  import axios from 'axios';
+import api from './api';
 
 export const getApprovedEvents = () =>
-    axios.get('/api/v1/events');
+    api.get('/events');
 
 export const getEventById = (id) =>
-    axios.get(`/api/v1/events/${id}`);
+    api.get(`/events/${id}`);
 
 export const createEvent = (eventData) =>
-    axios.post('/api/v1/events', eventData);
+    api.post('/events', eventData);
 
 export const updateEvent = (id, eventData) =>
-    axios.put(`/api/v1/events/${id}`, eventData);
+    api.put(`/events/${id}`, eventData);
 
 export const deleteEvent = (id) =>
-    axios.delete(`/api/v1/events/${id}`);
+    api.delete(`/events/${id}`);
 
 export const updateEventStatus = (id, status) =>
-    axios.put(`/api/v1/events/${id}/status`, { status });
+    api.put(`/events/${id}/status`, { status });
 
 export const getEventAnalytics = () =>
-    axios.get('/api/v1/events/analytics');
+    api.get('/events/analytics');

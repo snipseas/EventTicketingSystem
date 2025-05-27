@@ -1,27 +1,21 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { bookings } from '../../services/api';
+import { toast } from 'react-toastify';
 
 const BookTicketForm = ({ event }) => {
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const maxTickets = event.availableTickets;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
-        setSuccess('');
         try {
-            await axios.post('/api/v1/bookings', {
-                eventId: event._id || event.id,
-                tickets: quantity,
-            });
-            setSuccess('Booking successful!');
+            await bookings.create(event._id, quantity);
+            toast.success('Booking successful!');
         } catch (err) {
-            setError(err.response?.data?.message || 'Booking failed');
+            toast.error(err.response?.data?.message || 'Booking failed');
         } finally {
             setLoading(false);
         }
@@ -40,9 +34,7 @@ const BookTicketForm = ({ event }) => {
                     required
                 />
             </label>
-            <div>Total Price: ${quantity * (event.price || event.ticketPrice)}</div>
-            {error && <div style={{color:'red'}}>{error}</div>}
-            {success && <div style={{color:'green'}}>{success}</div>}
+            <div>Total Price: ${quantity * event.price}</div>
             <button type="submit" disabled={loading || quantity > maxTickets}>
                 {loading ? 'Booking...' : 'Book'}
             </button>

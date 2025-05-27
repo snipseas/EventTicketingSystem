@@ -31,9 +31,9 @@ const registerUser = async(req, res, next) => {
 
         const newUser = await User.create({ name, email, password, role });
 
-        const token = generateToken(user)
+        const token = generateToken(newUser);
 
-        console.log(token)
+        console.log('Registration successful, token:', token);
         res.status(201).json({
             _id: newUser._id,
             name: newUser.name,

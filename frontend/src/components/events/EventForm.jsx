@@ -28,8 +28,9 @@ const EventForm = ({ isEdit = false }) => {
         description: '',
         date: new Date(),
         location: '',
+        category: '',
         price: '',
-        ticketCount: '',
+        totalTickets: '',
         image: null
     });
 
@@ -83,23 +84,31 @@ const EventForm = ({ isEdit = false }) => {
         setLoading(true);
 
         try {
-            const formDataToSend = new FormData();
-            Object.keys(formData).forEach(key => {
-                if (formData[key] !== null) {
-                    formDataToSend.append(key, formData[key]);
-                }
-            });
+            const eventData = {
+                title: formData.title,
+                description: formData.description,
+                date: formData.date,
+                location: formData.location,
+                category: formData.category,
+                price: parseFloat(formData.price),
+                totalTickets: parseInt(formData.totalTickets),
+                availableTickets: parseInt(formData.totalTickets),
+                image: formData.image || ''
+            };
 
             if (isEdit) {
-                await events.update(id, formDataToSend);
+                await events.update(id, eventData);
                 toast.success('Event updated successfully');
             } else {
-                await events.create(formDataToSend);
+                await events.create(eventData);
                 toast.success('Event created successfully');
             }
             navigate('/my-events');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save event');
+            console.error('Event submission error:', error);
+            const errorMessage = error.response?.data?.message || 'Failed to save event';
+            toast.error(errorMessage);
+            console.error('Full error:', error);
         } finally {
             setLoading(false);
         }
@@ -156,6 +165,16 @@ const EventForm = ({ isEdit = false }) => {
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth
+                                label="Category"
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
                             <FormControl fullWidth>
                                 <InputLabel>Price</InputLabel>
                                 <OutlinedInput
@@ -173,9 +192,9 @@ const EventForm = ({ isEdit = false }) => {
                             <TextField
                                 fullWidth
                                 type="number"
-                                label="Available Tickets"
-                                name="ticketCount"
-                                value={formData.ticketCount}
+                                label="Total Tickets"
+                                name="totalTickets"
+                                value={formData.totalTickets}
                                 onChange={handleChange}
                                 required
                             />
@@ -200,22 +219,15 @@ const EventForm = ({ isEdit = false }) => {
                             )}
                         </Grid>
                         <Grid item xs={12}>
-                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => navigate('/my-events')}
-                                    disabled={loading}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Saving...' : (isEdit ? 'Update Event' : 'Create Event')}
-                                </Button>
-                            </Box>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                disabled={loading}
+                            >
+                                {loading ? 'Saving...' : (isEdit ? 'Update Event' : 'Create Event')}
+                            </Button>
                         </Grid>
                     </Grid>
                 </form>

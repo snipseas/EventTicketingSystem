@@ -29,6 +29,7 @@ const EventList = ({ isOrganizer = false }) => {
     }, [filters]);
 
     const fetchEvents = async () => {
+        setLoading(true);
         try {
             const response = await (isOrganizer ? events.getMyEvents() : events.getAll(filters));
             setEventsList(response.data);
@@ -121,4 +122,4 @@ const EventList = ({ isOrganizer = false }) => {
     );
 };
 
-export default EventList; 
+export default EventList;

@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { bookings } from '../services/api';
+import { toast } from 'react-toastify';
 
 const UserBookingsPage = () => {
-  const [bookings, setBookings] = useState([]);
+  const [bookingsList, setBookingsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [canceling, setCanceling] = useState('');
-  const [error, setError] = useState('');
 
-  const fetchBookings = () => {
+  const fetchBookings = async () => {
     setLoading(true);
-    axios.get('/api/v1/bookings/my')
-      .then(res => {
-        setBookings(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setBookings([]);
-        setLoading(false);
-      });
+    try {
+      const response = await bookings.getMyBookings();
+      setBookingsList(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch bookings');
+      setBookingsList([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -26,33 +26,32 @@ const UserBookingsPage = () => {
 
   const handleCancel = async (bookingId) => {
     setCanceling(bookingId);
-    setError('');
     try {
-      await axios.delete(`/api/v1/bookings/${bookingId}`);
+      await bookings.cancel(bookingId);
+      toast.success('Booking cancelled successfully');
       fetchBookings();
-    } catch (err) {
-      setError('Failed to cancel booking');
+    } catch (error) {
+      toast.error('Failed to cancel booking');
     } finally {
       setCanceling('');
     }
   };
 
   if (loading) return <div>Loading...</div>;
-  if (!bookings.length) return <div>No bookings found.</div>;
+  if (!bookingsList.length) return <div>No bookings found.</div>;
 
   return (
     <div>
       <h2>My Bookings</h2>
-      {error && <div style={{color:'red'}}>{error}</div>}
       <ul>
-        {bookings.map(booking => (
-          <li key={booking._id || booking.id}>
-            <strong>{booking.event?.title || booking.eventName}</strong> — {booking.ticketsBooked || booking.tickets} ticket(s) — ${booking.totalPrice}
+        {bookingsList.map(booking => (
+          <li key={booking._id}>
+            <strong>{booking.event?.title}</strong> — {booking.ticketQuantity} ticket(s) — ${booking.totalPrice}
             <button
-              onClick={() => handleCancel(booking._id || booking.id)}
-              disabled={canceling === (booking._id || booking.id)}
+              onClick={() => handleCancel(booking._id)}
+              disabled={canceling === booking._id}
             >
-              {canceling === (booking._id || booking.id) ? 'Canceling...' : 'Cancel'}
+              {canceling === booking._id ? 'Canceling...' : 'Cancel'}
             </button>
           </li>
         ))}

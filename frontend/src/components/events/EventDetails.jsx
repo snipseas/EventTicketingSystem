@@ -26,6 +26,11 @@ const EventDetails = () => {
     const [ticketQuantity, setTicketQuantity] = useState(1);
 
     useEffect(() => {
+        if (!eventId) {
+            toast.error('Invalid event ID');
+            navigate('/');
+            return;
+        }
         fetchEventDetails();
     }, [eventId]);
 
@@ -66,7 +71,7 @@ const EventDetails = () => {
     if (loading) return <Loader />;
     if (!event) return null;
 
-    const isAvailable = event.ticketCount > 0;
+    const isAvailable = event.availableTickets > 0;
     const totalPrice = ticketQuantity * event.price;
 
     return (
@@ -122,7 +127,7 @@ const EventDetails = () => {
                                     <ConfirmationNumber sx={{ mr: 1 }} />
                                     <Typography>
                                         {isAvailable 
-                                            ? `${event.ticketCount} tickets available`
+                                            ? `${event.availableTickets} tickets available`
                                             : 'Sold Out'
                                         }
                                     </Typography>
@@ -141,8 +146,8 @@ const EventDetails = () => {
                                             type="number"
                                             label="Quantity"
                                             value={ticketQuantity}
-                                            onChange={(e) => setTicketQuantity(Math.max(1, Math.min(event.ticketCount, parseInt(e.target.value))))}
-                                            InputProps={{ inputProps: { min: 1, max: event.ticketCount } }}
+                                            onChange={(e) => setTicketQuantity(Math.max(1, Math.min(event.availableTickets, parseInt(e.target.value))))}
+                                            InputProps={{ inputProps: { min: 1, max: event.availableTickets } }}
                                             disabled={!isAvailable}
                                             fullWidth
                                         />

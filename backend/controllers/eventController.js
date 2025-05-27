@@ -3,17 +3,34 @@ const User = require('../models/User');
 
 // Create a new event (Event Organizer)
 const createEvent = async(req, res) => {
-    const { name, description, date, totalTickets } = req.body;
+    const { 
+        title, 
+        description, 
+        date, 
+        location, 
+        category, 
+        image, 
+        price, 
+        totalTickets 
+    } = req.body;
 
-    if (!name || !description || !date || !totalTickets) {
-        return res.status(400).json({ message: 'All fields are required' });
+    // Check required fields
+    if (!title || !description || !date || !location || !category || !price || !totalTickets) {
+        return res.status(400).json({ 
+            message: 'Missing required fields',
+            required: ['title', 'description', 'date', 'location', 'category', 'price', 'totalTickets']
+        });
     }
 
     try {
         const event = await Event.create({
-            name,
+            title,
             description,
             date,
+            location,
+            category,
+            image: image || '',
+            price,
             totalTickets,
             availableTickets: totalTickets,
             organizer: req.user._id,
@@ -21,7 +38,11 @@ const createEvent = async(req, res) => {
 
         res.status(201).json({ message: 'Event created successfully', event });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating event', error: error.message });
+        console.error('Event creation error:', error);
+        res.status(500).json({ 
+            message: 'Error creating event', 
+            error: error.message 
+        });
     }
 };
 
@@ -32,6 +53,22 @@ const getApprovedEvents = async(req, res) => {
         res.status(200).json(events);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching events', error: error.message });
+    }
+};
+
+// Get events created by the current organizer
+const getMyEvents = async(req, res) => {
+    try {
+        const events = await Event.find({ organizer: req.user._id })
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(events);
+    } catch (error) {
+        console.error('Get my events error:', error);
+        res.status(500).json({ 
+            message: 'Error fetching your events', 
+            error: error.message 
+        });
     }
 };
 
@@ -63,11 +100,15 @@ const updateEvent = async(req, res) => {
             return res.status(403).json({ message: 'You are not authorized to update this event' });
         }
 
-        const { name, description, date, totalTickets } = req.body;
+        const { title, description, date, location, category, image, price, totalTickets } = req.body;
 
-        if (name) event.name = name;
+        if (title) event.title = title;
         if (description) event.description = description;
         if (date) event.date = date;
+        if (location) event.location = location;
+        if (category) event.category = category;
+        if (image) event.image = image;
+        if (price) event.price = price;
         if (totalTickets) {
             event.availableTickets += totalTickets - event.totalTickets;
             event.totalTickets = totalTickets;
@@ -102,7 +143,7 @@ const deleteEvent = async(req, res) => {
 
 const updateEventStatus = async(req, res) => {
     try {
-        if (!req.user.isAdmin) {
+        if (req.user.role !== 'admin') {
             return res.status(403).json({
                 success: false,
                 error: 'Admin access required'
@@ -146,8 +187,8 @@ const getEventAnalytics = async(req, res) => {
     try {
         let query = {};
 
-        if (req.user.isOrganizer) {
-            query.organizer = req.user.id;
+        if (req.user.role === 'organizer') {
+            query.organizer = req.user._id;
         }
 
         const events = await Event.find(query);
@@ -155,10 +196,11 @@ const getEventAnalytics = async(req, res) => {
         const analytics = events.map(event => ({
             eventId: event._id,
             title: event.title,
-            ticketsAvailable: event.ticketsAvailable,
-            ticketsSold: event.ticketsSold,
-            soldPercentage: Math.round((event.ticketsSold / event.ticketsAvailable) * 100),
-            revenue: event.ticketsSold * event.price
+            totalTickets: event.totalTickets,
+            availableTickets: event.availableTickets,
+            ticketsSold: event.totalTickets - event.availableTickets,
+            soldPercentage: Math.round(((event.totalTickets - event.availableTickets) / event.totalTickets) * 100),
+            revenue: (event.totalTickets - event.availableTickets) * event.price
         }));
 
         res.json({
@@ -174,6 +216,7 @@ const getEventAnalytics = async(req, res) => {
         });
     }
 };
+
 module.exports = {
     createEvent,
     getApprovedEvents,
@@ -182,4 +225,5 @@ module.exports = {
     deleteEvent,
     updateEventStatus,
     getEventAnalytics,
+    getMyEvents
 };

@@ -1,7 +1,6 @@
 // authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { UnauthorizedError } = require('./errorHandler');
 
 const protect = async (req, res, next) => {
     let token;
@@ -11,19 +10,27 @@ const protect = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
 
             if (!process.env.JWT_SECRET) {
-                throw new Error('JWT_SECRET is not defined in the environment variables');
+                console.error('JWT_SECRET is not defined in the environment variables');
+                return res.status(500).json({ message: 'Server configuration error' });
             }
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = await User.findById(decoded.id).select('-password');
+            const user = await User.findById(decoded.id).select('-password');
 
-            if (!req.user) {
-                return res.status(404).json({ message: 'User not found' });
+            if (!user) {
+                return res.status(401).json({ message: 'User not found or token invalid' });
             }
 
+            req.user = user;
             next();
         } catch (error) {
-            console.error(error);
+            console.error('Auth middleware error:', error);
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Invalid token' });
+            }
+            if (error.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: 'Token expired' });
+            }
             return res.status(401).json({ message: 'Not authorized, token failed' });
         }
     } else {
@@ -33,8 +40,13 @@ const protect = async (req, res, next) => {
 
 const authorize = (...roles) => {
     return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
         if (!roles.includes(req.user.role)) {
-            return res.status(403).json({ message: 'Not authorized to access this route' });
+            return res.status(403).json({ 
+                message: `User role ${req.user.role} is not authorized to access this route`
+            });
         }
         next();
     };

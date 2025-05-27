@@ -18,17 +18,17 @@ const router = express.Router();
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 
+// Event Organizer Routes
+router.get('/events', protect, authorize('organizer', 'admin'), getUserEvents);
+router.get('/events/analytics', protect, authorize('organizer', 'admin'), getUserEventAnalytics);
+
+// Standard User Routes
+router.get('/bookings', protect, authorize('user'), getUserBookings);
+
 // Admin Routes
 router.get('/', protect, authorize('admin'), getAllUsers);
 router.get('/:id', protect, authorize('admin'), getUserById);
 router.put('/:id', protect, authorize('admin'), updateUserRole);
 router.delete('/:id', protect, authorize('admin'), deleteUser);
-
-// Standard User Routes
-router.get('/bookings', protect, authorize('user'), getUserBookings);
-
-// Event Organizer Routes
-router.get('/events', protect, authorize('organizer'), getUserEvents);
-router.get('/events/analytics', protect, authorize('organizer'), getUserEventAnalytics);
 
 module.exports = router;
