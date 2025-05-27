@@ -28,7 +28,7 @@ const EventDetails = () => {
     useEffect(() => {
         if (!eventId) {
             toast.error('Invalid event ID');
-            navigate('/');
+            navigate('/events');
             return;
         }
         fetchEventDetails();
@@ -37,10 +37,15 @@ const EventDetails = () => {
     const fetchEventDetails = async () => {
         try {
             const response = await events.getById(eventId);
+            if (!response.data) {
+                throw new Error('Event not found');
+            }
             setEvent(response.data);
         } catch (error) {
-            toast.error('Failed to fetch event details');
-            navigate('/');
+            console.error('Error fetching event:', error);
+            const errorMessage = error.response?.data?.message || 'Failed to fetch event details';
+            toast.error(errorMessage);
+            navigate('/events');
         } finally {
             setLoading(false);
         }
@@ -58,6 +63,7 @@ const EventDetails = () => {
             toast.success('Booking successful!');
             fetchEventDetails(); // Refresh event details to update ticket count
         } catch (error) {
+            console.error('Booking error:', error);
             toast.error(error.response?.data?.message || 'Failed to book tickets');
         }
     };
@@ -135,7 +141,7 @@ const EventDetails = () => {
                             </Grid>
                         </Grid>
                         <Divider sx={{ my: 3 }} />
-                        {user && user.role === 'user' && (
+                        {user && user.role === 'user' && event.status === 'approved' && (
                             <Box sx={{ mt: 3 }}>
                                 <Typography variant="h6" gutterBottom>
                                     Book Tickets

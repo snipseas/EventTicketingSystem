@@ -46,12 +46,15 @@ const createEvent = async(req, res) => {
     }
 };
 
-// Get list of all approved events (Public)
+// Get list of all events (Public)
 const getApprovedEvents = async(req, res) => {
     try {
-        const events = await Event.find({ status: 'approved' });
+        const events = await Event.find()
+            .populate('organizer', 'name email')
+            .sort({ createdAt: -1 });
         res.status(200).json(events);
     } catch (error) {
+        console.error('Get events error:', error);
         res.status(500).json({ message: 'Error fetching events', error: error.message });
     }
 };
@@ -75,7 +78,8 @@ const getMyEvents = async(req, res) => {
 // Get details of a single event (Public)
 const getEventById = async(req, res) => {
     try {
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id)
+            .populate('organizer', 'name email');
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -83,7 +87,14 @@ const getEventById = async(req, res) => {
 
         res.status(200).json(event);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching event', error: error.message });
+        console.error('Get event by ID error:', error);
+        if (error.name === 'CastError') {
+            return res.status(400).json({ message: 'Invalid event ID format' });
+        }
+        res.status(500).json({ 
+            message: 'Error fetching event', 
+            error: error.message 
+        });
     }
 };
 
